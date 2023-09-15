@@ -2,6 +2,10 @@ import os, time, shutil, librosa
 import model_def, onset_novelty
 import numpy as np
 
+# from global_var import onsets
+
+
+
 MEL_PATH = './imsi/mel/'
 DATA_PATH = './data/'
 BPM_PATH = './BPM/'
@@ -14,7 +18,7 @@ prd_cls = []
 def run_cnn():
     
     arr = []
-    prd_cls.clear()
+    # prd_cls.clear()
     
     ####
     bpm = float(os.listdir(BPM_PATH)[0])
@@ -37,43 +41,45 @@ def run_cnn():
     
     prd = model_def.model.predict(norm_test_ds)
     
-    for i in range(prd.shape[0]):
-        if prd[i].max() > 0.7:
-            arr.append(prd[i].argmax())
-            # arr.append(prd[i].argmax()-1 if prd[i].argmax() >7 else prd[i].argmax())
-        else:
-            beat_pos = beat[i]
-            top3_idx = prd[i].argsort()[-3:][::-1]
-            beat_pos_start = max(0, beat_pos-31)
+    # for i in range(prd.shape[0]):
+    #     if prd[i].max() > 0.7:
+    #         arr.append(prd[i].argmax())
+    #         # arr.append(prd[i].argmax()-1 if prd[i].argmax() >7 else prd[i].argmax())
+    #     else:
+    #         beat_pos = beat[i]
+    #         # top3_idx = prd[i].argsort()[-3:][::-1]
+    #         beat_pos_start = max(0, beat_pos-31)
             
-            starting_point = 0
-            if beat_pos - 31 < 0:
-                starting_point = abs(beat_pos - 31)
+    #         starting_point = 0
+    #         if beat_pos - 31 < 0:
+    #             starting_point = abs(beat_pos - 31)
             
-            bar = np.zeros((31,30))
+    #         bar = np.zeros((31,30))
 
-            if beat_pos_start != beat_pos:
-                for j in range(int(beat_pos_start), int(beat_pos)):
-                    if j in beat:
-                        bar[int(starting_point+j-beat_pos_start)][arr[list(beat).index(j)]] = 1
+    #         if beat_pos_start != beat_pos:
+    #             for j in range(int(beat_pos_start), int(beat_pos)):
+    #                 if j in beat:
+    #                     bar[int(starting_point+j-beat_pos_start)][arr[list(beat).index(j)]] = 1
             
-            for j in range(len(bar)):
-                if np.where(bar[j] == 1)[0].size == 0:
-                    bar[j][29] = 1
+    #         for j in range(len(bar)):
+    #             if np.where(bar[j] == 1)[0].size == 0:
+    #                 bar[j][29] = 1
 
-            # print(bar)
-            rnn_prd = model_def.rnn_model.predict(np.expand_dims(bar, axis=0))[0][0]
-            # print(rnn_prd)
-            # max_val = -1
-            # for candidate in range(len(rnn_prd)):
-            #     if max_val < rnn_prd[candidate] * prd[i][candidate]:
-            #         max_val = rnn_prd[candidate] * prd[i][candidate]
-            #         chosen = candidate
+    #         # print(bar)
+    #         rnn_prd = model_def.rnn_model.predict(np.expand_dims(bar, axis=0))[0][0]
+    #         # print(rnn_prd)
+    #         # max_val = -1
+    #         # for candidate in range(len(rnn_prd)):
+    #         #     if max_val < rnn_prd[candidate] * prd[i][candidate]:
+    #         #         max_val = rnn_prd[candidate] * prd[i][candidate]
+    #         #         chosen = candidate
                                 
-            # arr.append(chosen)######## imsi
+    #         # arr.append(chosen)######## imsi
             
-            arr.append((prd[i] * rnn_prd).argmax())
+    #         arr.append((prd[i] * rnn_prd).argmax())
     
+    for i in range(prd.shape[0]):
+            arr.append(prd[i].argmax())
     for a in arr:
         prd_cls.append(model_def.class_names[a])
     
@@ -99,13 +105,14 @@ def run_cnn():
     
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
+def init_model():
     empty_cnt = 0
     prev_len = 0
-    
+    # print('init!!')
     try:
         while True:
-            
+            # print('looping')
             time.sleep(0.5)
             
             files = os.listdir(MEL_PATH)
@@ -120,32 +127,35 @@ if __name__ == "__main__":
                 for file in files:
                     shutil.move(os.path.join(MEL_PATH, file), DATA_PATH)
                 
-                print(os.listdir(DATA_PATH))
+                # print(os.listdir(DATA_PATH))
                 
+                # print('run_cnn')
                 run_cnn()
 
-                for i in range(len(files)):
-                    print(librosa.samples_to_time(int(files[i][:-4])))
-                    print(prd_cls[i])
-                    print('---')
-                print('----')
+                # for i in range(len(files)):
+                #     print(librosa.samples_to_time(int(files[i][:-4])))
+                #     print(prd_cls[i])
+                #     print('---')
+                # print('----')
                 
             elif empty_cnt > 10:
+                # print('asdfasdfasdfasdf')
                 break
+                
             
             if len(files) > 12:
                 for file in files:
                     shutil.move(os.path.join(MEL_PATH, file), DATA_PATH)
                 
-                print(os.listdir(DATA_PATH))
+                # print(os.listdir(DATA_PATH))
                 
                 run_cnn()
 
-                for i in range(len(files)):
-                    print(librosa.samples_to_time(int(files[i][:-4])))
-                    print(prd_cls[i])
-                    print('---')
-                print('----')
+                # for i in range(len(files)):
+                #     print(librosa.samples_to_time(int(files[i][:-4])))
+                #     print(prd_cls[i])
+                #     print('---')
+                # print('----')
                 
             rm_files = os.listdir(DATA_PATH)
             for file in rm_files:

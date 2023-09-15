@@ -17,7 +17,8 @@ pos = ['s','oh','ch', 'c', 'ht','mt','lt','r']
 
 
 model = ResNet50(include_top=True, weights=None , input_shape=(img_height, img_width, 3), pooling=max, classes=29)
-model.load_weights('./chkpnt/0106__/mel/cp-0008.ckpt')
+# model.load_weights('./chkpnt/0106__/mel/cp-0008.ckpt')
+model.load_weights('./.ckpt/cnn/cp-0008.ckpt')
 model.compile(optimizer=tf.keras.optimizers.Adam(), loss=tf.keras.losses.CategoricalCrossentropy(), metrics=['accuracy', tf.keras.metrics.TopKCategoricalAccuracy(k=3)])
 n_hidden=128
 input_train=tf.keras.Input(shape=(31,30))

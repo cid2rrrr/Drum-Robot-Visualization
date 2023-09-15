@@ -5,13 +5,11 @@ import pyaudio, wave
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 22050  # 샘플링 레이트 (Hz)
-CHUNK = 512 * 32 # 버퍼 크기 (프레임 수)
+CHUNK = 512 * 2 # 버퍼 크기 (프레임 수)
 
 
 # 녹음된 오디오를 저장할 WAV 파일 설정
 OUTPUT_FILENAME = "output.wav"
-
-
 
 
 if __name__ == "__main__":
